@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tamilan Sports Karate Academy | Virudhunagar, Tamil Nadu</title>
+    <meta name="description" content="Professional martial arts academy — district, state & national tournament training. Certified 4th Dan Black Belt instruction.">
+    <link rel="stylesheet" href="css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav class="nav" id="nav">
+    <a class="nav-logo" href="#home">🥋 TSKA</a>
+    <button class="nav-burger" id="burger">&#9776;</button>
+    <ul class="nav-links" id="navLinks">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#chairman">Chairman</a></li>
+        <li><a href="#achievements">Achievements</a></li>
+        <li><a href="#tournaments">Tournaments</a></li>
+        <li><a href="#fees">Fees</a></li>
+        <li><a href="#gallery">Gallery</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="student-register.html" class="nav-cta">Join Now</a></li>
+        <li><a href="student-login.html" class="nav-login">Student Login</a></li>
+        <li><a href="master-login.html" class="nav-admin">Admin</a></li>
+    </ul>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="home" class="hero">
+    <div class="hero-bg"></div>
+    <canvas id="heroCanvas"></canvas>
+    <div class="hero-content">
+        <div class="belt-anim" id="beltAnim"></div>
+        <p class="hero-pre">Virudhunagar District, Tamil Nadu</p>
+        <h1 class="hero-title">
+            <span class="ht-line1">Tamilan Sports</span>
+            <span class="ht-line2">KARATE</span>
+            <span class="ht-line3">Academy</span>
+        </h1>
+        <p class="hero-motto">The Symbol of Brave Tamilians</p>
+        <p class="hero-sub">Discipline &bull; Strength &bull; Honor &bull; Excellence</p>
+        <div class="hero-btns">
+            <a href="student-register.html" class="btn-gold pulse">Join the Academy</a>
+            <a href="#about" class="btn-outline">Discover More</a>
+        </div>
+    </div>
+    <div class="kick-silhouette"></div>
+    <div class="scroll-hint">↓ Scroll</div>
+</section>
+
+<!-- ── ANNOUNCEMENTS ── -->
+<section id="announcements" class="ann-bar">
+    <span class="ann-label">📢 ANNOUNCEMENTS</span>
+    <div class="ann-ticker" id="annTicker">
+        <span id="annText">Welcome to Tamilan Sports Karate Academy! New batches starting soon.</span>
+    </div>
+</section>
+
+<!-- ── ABOUT ── -->
+<section id="about" class="section reveal">
+    <div class="container">
+        <h2 class="sec-title">About the Academy</h2>
+        <div class="about-grid">
+            <div class="about-logo reveal-left">
+                <div class="logo-circle">
+                    <img src="assets/logo.png" alt="TSKA Logo" onerror="this.parentElement.innerHTML='🥋'">
+                </div>
+            </div>
+            <div class="about-text reveal-right">
+                <p>Tamilan Sports Karate Academy is a professional martial arts academy focused on <strong>discipline</strong>, <strong>self-defense</strong>, <strong>fitness</strong>, and competitive karate training. The academy trains students of all age groups and prepares them for <strong>district</strong>, <strong>state</strong>, and <strong>national level</strong> tournaments.</p>
+                <div class="about-stats">
+                    <div class="stat-box"><span class="stat-num" data-target="200">0</span><span>Students</span></div>
+                    <div class="stat-box"><span class="stat-num" data-target="10">0</span><span>Years</span></div>
+                    <div class="stat-box"><span class="stat-num" data-target="50">0</span><span>Medals</span></div>
+                    <div class="stat-box"><span class="stat-num" data-target="4">0</span><span>Dan Belt</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── CHAIRMAN ── -->
+<section id="chairman" class="section chairman-section reveal">
+    <div class="container">
+        <h2 class="sec-title">👑 Chairman & Super Admin</h2>
+        <div class="chairman-card">
+            <div class="chairman-photo-wrap">
+                <div class="chairman-photo">
+                    <img src="assets/logo.png" alt="Chairman" onerror="this.parentElement.innerHTML='<span style=font-size:4rem>👤</span>'">
+                </div>
+                <div class="chairman-belt-badge">4th Dan Black Belt</div>
+            </div>
+            <div class="chairman-info">
+                <h3>Renshi. Moosa AR</h3>
+                <ul class="badge-list">
+                    <li><span class="badge-icon">🥋</span> 4th Dan Black Belt – IBSKA</li>
+                    <li><span class="badge-icon">🏛️</span> Virudhunagar District Chief Instructor – IBSKA</li>
+                    <li><span class="badge-icon">⚖️</span> Karate India Organization – Grade A Judge</li>
+                    <li><span class="badge-icon">👑</span> Chairman – Tamilan Sports Karate Academy</li>
+                    <li><span class="badge-icon">🔐</span> Super Admin – Website</li>
+                </ul>
+                <blockquote class="chairman-quote">"Excellence is not a destination but a continuous journey. Every student who trains here carries the pride of Tamil Nadu."</blockquote>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── ACHIEVEMENTS ── -->
+<section id="achievements" class="section dark-section reveal">
+    <div class="container">
+        <h2 class="sec-title">🏆 Achievements</h2>
+        <div id="achievementsGrid" class="achievements-grid"></div>
+    </div>
+</section>
+
+<!-- ── BENEFITS ── -->
+<section id="benefits" class="section benefits-section reveal">
+    <div class="container">
+        <h2 class="sec-title">⭐ Why Choose Us?</h2>
+        <div class="benefits-grid">
+            <div class="benefit-card">✔ 4th Dan Black Belt Training</div>
+            <div class="benefit-card">✔ District Chief Instructor</div>
+            <div class="benefit-card">✔ Grade A Judge Authority</div>
+            <div class="benefit-card">✔ National Tournament Prep</div>
+            <div class="benefit-card">✔ Resume Value Certificate</div>
+            <div class="benefit-card">✔ Discipline + Self Defense</div>
+            <div class="benefit-card">✔ Affordable ₹700 Monthly</div>
+            <div class="benefit-card">✔ Digital ID Card System</div>
+            <div class="benefit-card">✔ Official Certificate Generation</div>
+            <div class="benefit-card">✔ Structured Belt System</div>
+        </div>
+    </div>
+</section>
+
+<!-- ── TOURNAMENTS ── -->
+<section id="tournaments" class="section dark-section reveal">
+    <div class="container">
+        <h2 class="sec-title">🥊 Tournaments</h2>
+        <div id="tournamentGrid" class="tournament-grid"></div>
+    </div>
+</section>
+
+<!-- ── FEES ── -->
+<section id="fees" class="section fees-section reveal">
+    <div class="container">
+        <h2 class="sec-title">💰 Fees Structure</h2>
+        <div class="fees-cards">
+            <div class="fee-card">
+                <div class="fee-label">Registration Fee</div>
+                <div class="fee-amount">₹<span id="regFeeAmt">200</span></div>
+                <div class="fee-note">One-time • After Chairman approval</div>
+            </div>
+            <div class="fee-card featured">
+                <div class="fee-badge">Most Popular</div>
+                <div class="fee-label">Monthly Training</div>
+                <div class="fee-amount">₹<span id="monthlyFeeAmt">700</span></div>
+                <div class="fee-note">Kids • Teens • Adults batches</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── GALLERY ── -->
+<section id="gallery" class="section dark-section reveal">
+    <div class="container">
+        <h2 class="sec-title">📸 Gallery</h2>
+        <div id="galleryGrid" class="gallery-grid"></div>
+    </div>
+</section>
+
+<!-- ── CONTACT ── -->
+<section id="contact" class="section reveal">
+    <div class="container">
+        <h2 class="sec-title">📞 Contact Us</h2>
+        <div class="contact-grid">
+            <div class="contact-info">
+                <div class="info-block">
+                    <h4>📍 Location</h4>
+                    <p>Virudhunagar District<br>Tamil Nadu, India</p>
+                </div>
+                <div class="info-block">
+                    <h4>📞 Contact</h4>
+                    <p id="contactNum">Contact admin for number</p>
+                </div>
+                <div class="info-block social-block">
+                    <h4>Follow Us</h4>
+                    <div class="social-row">
+                        <a href="#" class="social-btn">Facebook</a>
+                        <a href="#" class="social-btn">Instagram</a>
+                        <a href="#" class="social-btn">YouTube</a>
+                    </div>
+                </div>
+            </div>
+            <form id="enquiryForm" class="enquiry-form">
+                <h4>Send an Enquiry</h4>
+                <div class="fg"><label>Name *</label><input type="text" name="name" required></div>
+                <div class="fg"><label>Phone *</label><input type="tel" name="phone" required></div>
+                <div class="fg"><label>Email</label><input type="email" name="email"></div>
+                <div class="fg"><label>Message</label><textarea name="message" rows="3"></textarea></div>
+                <div id="enqMsg" class="msg hidden"></div>
+                <button type="submit" class="btn-gold w100">Send Enquiry</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+    <div class="container">
+        <p class="footer-logo">🥋 Tamilan Sports Karate Academy</p>
+        <p class="footer-motto">The Symbol of Brave Tamilians</p>
+        <div class="footer-links">
+            <a href="student-register.html">Join Academy</a>
+            <a href="student-login.html">Student Login</a>
+            <a href="master-login.html">Admin Login</a>
+        </div>
+        <p class="footer-copy">© 2025 Tamilan Sports Karate Academy | Virudhunagar, Tamil Nadu</p>
+    </div>
+</footer>
+
+<script src="js/site.js"></script>
+<script src="js/home.js"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login — TSKA</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="nav">
+    <a class="nav-logo" href="index.html">🥋 TSKA</a>
+</nav>
+
+<div class="auth-page">
+    <div class="auth-box gold-border">
+        <h1>Chairman Admin Login</h1>
+        <div id="adminMsg" class="msg hidden"></div>
+        <form id="adminForm">
+            <div class="fg"><label>Admin ID</label><input type="text" id="aId" required placeholder="renshi_moosa"></div>
+            <div class="fg"><label>Password</label><input type="password" id="aPw" required></div>
+            <button type="submit" class="btn-gold w100">Login as Chairman</button>
+        </form>
+        <a href="index.html" class="back-home">← Back to Website</a>
+    </div>
+</div>
+
+<script src="js/db.js"></script>
+<script>
+    document.getElementById('adminForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const id = document.getElementById('aId').value.trim();
+        const pw = document.getElementById('aPw').value;
+        const msg = document.getElementById('adminMsg');
+        const masters = DB.getMasters();
+        const found = masters.find(m => m.id === id && m.password === pw);
+        if (found) {
+            sessionStorage.setItem('tska_master', JSON.stringify(found));
+            window.location.href = 'master-dashboard.html';
+        } else {
+            msg.textContent = 'Invalid credentials.';
+            msg.className = 'msg msg-err'; msg.classList.remove('hidden');
+        }
+    });
+</script>
+</body>
+</html>

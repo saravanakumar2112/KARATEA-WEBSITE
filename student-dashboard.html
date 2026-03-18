@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard — TSKA</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+<nav class="nav">
+    <a class="nav-logo" href="index.html">🥋 TSKA</a>
+    <ul class="nav-links" style="display:flex;gap:.75rem">
+        <li><span id="navWelcome" style="color:var(--gold)"></span></li>
+        <li><a href="index.html" class="nav-login" id="logoutBtn">Logout</a></li>
+    </ul>
+</nav>
+
+<div class="dash-wrap">
+<div class="dash-inner">
+    <div class="dash-title">Student Dashboard <span id="regNoDisplay" style="color:var(--gold);font-size:1rem"></span></div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="profile">My Profile</button>
+        <button class="tab-btn" data-tab="idcard">ID Card</button>
+        <button class="tab-btn" data-tab="attendance">Attendance</button>
+        <button class="tab-btn" data-tab="fees">Fees</button>
+        <button class="tab-btn" data-tab="certificates">Certificates</button>
+        <button class="tab-btn" data-tab="settings">Settings</button>
+    </div>
+
+    <!-- Profile Tab -->
+    <div class="tab-pane active" id="tab-profile">
+        <div class="dash-card">
+            <h3>My Profile</h3>
+            <table class="tbl" id="profileTable"></table>
+        </div>
+    </div>
+
+    <!-- ID Card Tab -->
+    <div class="tab-pane" id="tab-idcard">
+        <div class="dash-card">
+            <h3>Digital ID Card</h3>
+            <div id="idCard" class="id-card">
+                <div class="id-card-logo">🥋</div>
+                <div class="id-card-academy">TAMILAN SPORTS KARATE ACADEMY</div>
+                <div class="id-card-photo" id="idPhoto"><span>📷</span></div>
+                <div class="id-card-name" id="idName">—</div>
+                <div class="id-card-reg"  id="idReg">—</div>
+                <div class="id-card-belt" id="idBelt">—</div>
+                <div class="id-card-row">
+                    <span>📅 <span id="idJoin">—</span></span>
+                    <span id="idBatch">—</span>
+                </div>
+                <div class="id-card-sig">Renshi. Moosa AR | Chairman</div>
+            </div>
+            <div style="text-align:center;margin-top:1.5rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+                <button class="btn-gold" id="downloadId">⬇ Download ID Card</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendance Tab -->
+    <div class="tab-pane" id="tab-attendance">
+        <div class="dash-card">
+            <h3>Attendance Record</h3>
+            <div class="att-stat-row" id="attStats"></div>
+            <div style="margin-bottom:1rem">
+                <label>Month: </label>
+                <input type="month" id="attMonth" style="background:var(--black3);color:var(--white);border:1px solid rgba(212,175,55,.3);padding:.4rem .75rem;border-radius:8px">
+            </div>
+            <div class="att-grid" id="attGrid"></div>
+        </div>
+    </div>
+
+    <!-- Fees Tab -->
+    <div class="tab-pane" id="tab-fees">
+        <div class="dash-card">
+            <h3>Fee Status</h3>
+            <p>Monthly Fee: <strong style="color:var(--gold)" id="feeAmt">₹700</strong></p>
+            <p style="margin:.75rem 0">Status: <span id="feeStatus" class="pill pill-pending">Loading...</span></p>
+            <h4 style="color:var(--gold);margin:1rem 0 .5rem">Payment History</h4>
+            <div id="feeHistory"><p style="opacity:.6">No payment records yet.</p></div>
+        </div>
+    </div>
+
+    <!-- Certificates Tab -->
+    <div class="tab-pane" id="tab-certificates">
+        <div class="dash-card">
+            <h3>My Certificates</h3>
+            <div id="certList"></div>
+        </div>
+        <!-- Certificate Preview -->
+        <div class="dash-card" id="certPreviewWrap" style="display:none">
+            <h3>Certificate Preview</h3>
+            <div id="certPreview"></div>
+            <div style="text-align:center;margin-top:1rem">
+                <button class="btn-gold" id="downloadCert">⬇ Download Certificate (PDF)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div class="tab-pane" id="tab-settings">
+        <div class="dash-card">
+            <h3>Update Profile</h3>
+            <form id="updateForm">
+                <div class="fg"><label>Email</label><input type="email" id="updEmail"></div>
+                <div class="fg"><label>Phone</label><input type="tel" id="updPhone"></div>
+                <div class="fg"><label>Change Password (blank = no change)</label><input type="password" id="updPass" placeholder="New password"></div>
+                <div id="updMsg" class="msg hidden"></div>
+                <button type="submit" class="btn-red">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script src="js/db.js"></script>
+<script>
+let student = JSON.parse(sessionStorage.getItem('tska_student'));
+if (!student) window.location.href = 'student-login.html';
+// Refresh from DB
+student = DB.getStudent(student.id) || student;
+
+document.getElementById('navWelcome').textContent = student.name;
+document.getElementById('regNoDisplay').textContent = student.regNo || '';
+document.getElementById('logoutBtn').addEventListener('click', () => {
+    sessionStorage.removeItem('tska_student');
+    window.location.href = 'index.html';
+});
+
+// ── Tabs ──
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+    });
+});
+
+// ── Profile ──
+const site = DB.getSite();
+document.getElementById('profileTable').innerHTML = `
+    <tr><th>Name</th><td>${student.name}</td></tr>
+    <tr><th>Register No.</th><td style="color:var(--gold);font-weight:700">${student.regNo || 'Pending'}</td></tr>
+    <tr><th>Username</th><td>${student.id}</td></tr>
+    <tr><th>Email</th><td>${student.email || '—'}</td></tr>
+    <tr><th>Contact</th><td>${student.contact || '—'}</td></tr>
+    <tr><th>Belt</th><td>${student.belt || 'White'}</td></tr>
+    <tr><th>Batch</th><td>${student.batch || '—'}</td></tr>
+    <tr><th>Join Date</th><td>${student.joinDate || '—'}</td></tr>
+`;
+
+// ── ID Card ──
+document.getElementById('idName').textContent  = student.name;
+document.getElementById('idReg').textContent   = student.regNo || 'Pending';
+document.getElementById('idBelt').textContent  = (student.belt || 'White') + ' Belt';
+document.getElementById('idJoin').textContent  = student.joinDate || '—';
+document.getElementById('idBatch').textContent = student.batch ? student.batch + ' Batch' : '';
+if (student.photo) {
+    const ph = document.getElementById('idPhoto');
+    ph.innerHTML = `<img src="${student.photo}" alt="Photo">`;
+}
+
+document.getElementById('downloadId').addEventListener('click', function() {
+    html2canvas(document.getElementById('idCard'), { scale:3, backgroundColor:'#1a0000' }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'TSKA_ID_' + (student.regNo || student.id) + '.png';
+        link.href = canvas.toDataURL();
+        link.click();
+    });
+});
+
+// ── Attendance ──
+const monthInput = document.getElementById('attMonth');
+const today = new Date();
+monthInput.value = today.toISOString().slice(0,7);
+monthInput.addEventListener('change', renderAttendance);
+renderAttendance();
+
+function renderAttendance() {
+    const [yr, mo] = monthInput.value.split('-').map(Number);
+    const att = student.attendance || {};
+    const daysInMonth = new Date(yr, mo, 0).getDate();
+    const firstDay    = new Date(yr, mo - 1, 1).getDay();
+
+    let present = 0, absent = 0;
+    Object.entries(att).forEach(([d, v]) => {
+        if (d.startsWith(monthInput.value)) { if (v === 'P') present++; else absent++; }
+    });
+
+    const totalDays = Object.keys(att).length;
+    const pct = totalDays ? Math.round((Object.values(att).filter(v => v === 'P').length / totalDays) * 100) : 0;
+
+    document.getElementById('attStats').innerHTML = `
+        <div class="att-stat"><span class="big">${present}</span>Present</div>
+        <div class="att-stat"><span class="big">${absent}</span>Absent</div>
+        <div class="att-stat"><span class="big">${pct}%</span>Total %</div>
+    `;
+
+    let html = '';
+    for (let i = 0; i < firstDay; i++) html += '<div class="att-day empty"></div>';
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dateKey = `${yr}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const val = att[dateKey];
+        const cls = val === 'P' ? 'present' : val === 'A' ? 'absent' : 'empty';
+        html += `<div class="att-day ${cls}" title="${dateKey}">${d}</div>`;
+    }
+    document.getElementById('attGrid').innerHTML = html;
+}
+
+// ── Fees ──
+const site2 = DB.getSite();
+document.getElementById('feeAmt').textContent = '₹' + (site2.fees || 700);
+const feeStatusEl = document.getElementById('feeStatus');
+feeStatusEl.textContent = student.feeStatus === 'paid' ? 'Paid' : 'Pending';
+feeStatusEl.className = 'pill ' + (student.feeStatus === 'paid' ? 'pill-approved' : 'pill-pending');
+
+const hist = student.feeHistory || [];
+document.getElementById('feeHistory').innerHTML = hist.length
+    ? hist.map(h => `<p style="padding:.4rem;border-bottom:1px solid rgba(255,255,255,.08)">📅 ${h.month} — <strong style="color:var(--gold)">₹${h.amount}</strong> — ${h.note || 'Paid'}</p>`).join('')
+    : '<p style="opacity:.6">No payment records yet.</p>';
+
+// ── Certificates ──
+const allCerts = DB.getCerts().filter(c => c.studentId === student.id);
+const certListEl = document.getElementById('certList');
+certListEl.innerHTML = allCerts.length
+    ? allCerts.map((c, i) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:.75rem;border-bottom:1px solid rgba(255,255,255,.08)">
+            <span>🏅 ${c.eventName} — ${c.date}</span>
+            <button class="btn-gold" onclick="showCert(${i})" style="padding:.4rem .9rem;font-size:.85rem">View</button>
+        </div>`).join('')
+    : '<p style="opacity:.6">No certificates issued yet.</p>';
+
+function showCert(i) {
+    const c = allCerts[i];
+    document.getElementById('certPreviewWrap').style.display = 'block';
+    document.getElementById('certPreview').innerHTML = `
+        <div class="certificate" id="certDoc">
+            <div class="cert-header">Tamilan Sports Karate Academy</div>
+            <div class="cert-seal">🥋</div>
+            <div class="cert-title">CERTIFICATE OF ${(c.type||'ACHIEVEMENT').toUpperCase()}</div>
+            <div class="cert-body">
+                This is to certify that<br>
+                <div class="cert-name">${student.name}</div>
+                <div style="font-size:.85rem;margin:.25rem 0">Register No: ${student.regNo}</div>
+                <br>has successfully participated in / achieved<br>
+                <div class="cert-event">${c.eventName}</div>
+            </div>
+            <div class="cert-sig">Date: ${c.date}<br><br>___________________________<br>Renshi. Moosa AR<br><small>Chairman | Tamilan Sports Karate Academy</small></div>
+        </div>`;
+    document.getElementById('certPreviewWrap').scrollIntoView({ behavior:'smooth' });
+}
+
+document.getElementById('downloadCert').addEventListener('click', function() {
+    const el = document.getElementById('certDoc');
+    if (!el) return;
+    html2canvas(el, { scale:3, backgroundColor:'#fffdf0' }).then(canvas => {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('l', 'mm', 'a4');
+        const iW = canvas.width, iH = canvas.height;
+        const pW = 297, pH = 210;
+        const ratio = Math.min(pW/iW, pH/iH);
+        const w = iW*ratio, h = iH*ratio;
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', (pW-w)/2, (pH-h)/2, w, h);
+        pdf.save('TSKA_Certificate_' + student.regNo + '.pdf');
+    });
+});
+
+// ── Settings ──
+document.getElementById('updEmail').value = student.email || '';
+document.getElementById('updPhone').value = student.contact || '';
+document.getElementById('updateForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const patch = { email: document.getElementById('updEmail').value.trim(), contact: document.getElementById('updPhone').value.trim() };
+    const np = document.getElementById('updPass').value;
+    if (np) { if (np.length < 6) { alert('Password too short'); return; } patch.password = np; }
+    const updated = DB.updateStudent(student.id, patch);
+    if (updated) { sessionStorage.setItem('tska_student', JSON.stringify(updated)); student = updated; }
+    const m = document.getElementById('updMsg');
+    m.textContent = 'Profile updated!'; m.className = 'msg msg-ok'; m.classList.remove('hidden');
+    setTimeout(() => m.classList.add('hidden'), 3000);
+});
+
+window.showCert = showCert;
+</script>
+</body>
+</html>

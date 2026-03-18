@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration — TSKA</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="nav">
+    <a class="nav-logo" href="index.html">🥋 TSKA</a>
+    <ul class="nav-links" style="display:flex">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="student-login.html" class="nav-login">Login</a></li>
+    </ul>
+</nav>
+
+<div class="auth-page">
+    <!-- Step 1: Registration Form -->
+    <div class="auth-box" id="step1">
+        <h1>New Student Registration</h1>
+        <p style="text-align:center;opacity:.7;margin-bottom:1.5rem;font-size:.9rem">Fill in your details. After submitting, pay ₹200 and upload proof. Chairman will approve your account.</p>
+        <div id="regMsg" class="msg hidden"></div>
+        <form id="regForm">
+            <div class="fg"><label>Choose Username *</label><input type="text" id="regUser" required placeholder="e.g. moosa_karate"></div>
+            <div class="fg"><label>Full Name *</label><input type="text" id="regName" required></div>
+            <div class="fg"><label>Password *</label><input type="password" id="regPass" required placeholder="Min 6 characters"></div>
+            <div class="fg"><label>Email</label><input type="email" id="regEmail"></div>
+            <div class="fg"><label>Phone *</label><input type="tel" id="regPhone" required></div>
+            <div class="fg"><label>Belt Level</label>
+                <select id="regBelt">
+                    <option value="White">White Belt (Beginner)</option>
+                    <option value="Yellow">Yellow Belt</option>
+                    <option value="Orange">Orange Belt</option>
+                    <option value="Green">Green Belt</option>
+                    <option value="Blue">Blue Belt</option>
+                    <option value="Brown">Brown Belt</option>
+                    <option value="Black">Black Belt</option>
+                </select>
+            </div>
+            <div class="fg"><label>Preferred Batch</label>
+                <select id="regBatch">
+                    <option value="Morning">Morning</option>
+                    <option value="Evening">Evening</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-gold w100">Next → Payment</button>
+        </form>
+        <a href="student-login.html" class="back-home">Already registered? Login</a>
+        <a href="index.html" class="back-home">← Back to Home</a>
+    </div>
+
+    <!-- Step 2: Payment -->
+    <div class="auth-box hidden" id="step2">
+        <h1>Pay Registration Fee</h1>
+        <p style="text-align:center;margin-bottom:.5rem">Registration Fee: <strong style="color:var(--gold);font-size:1.5rem">₹200</strong></p>
+        <div class="qr-box">
+            <div style="text-align:center">
+                <div style="font-size:2rem">📱</div>
+                <div style="font-size:.75rem;font-weight:700">Scan QR / Pay UPI</div>
+                <div id="upiDisplay" style="font-size:.8rem;margin-top:.25rem;color:#c41e3a">Loading...</div>
+            </div>
+        </div>
+        <p class="upi-note">After payment, upload your payment screenshot below.</p>
+        <div class="fg" style="margin-top:1rem">
+            <label>Upload Payment Screenshot *</label>
+            <input type="file" id="payScreenshot" accept="image/*" required>
+        </div>
+        <div id="payMsg" class="msg hidden"></div>
+        <button class="btn-gold w100" id="submitPay">Submit Registration</button>
+        <button class="btn-outline w100" style="margin-top:.75rem" id="backBtn">← Back</button>
+    </div>
+
+    <!-- Step 3: Success -->
+    <div class="auth-box hidden" id="step3">
+        <div style="text-align:center;padding:1rem">
+            <div style="font-size:4rem">✅</div>
+            <h2 style="color:var(--gold);margin:.5rem 0">Registration Submitted!</h2>
+            <p>Your registration is pending Chairman approval.</p>
+            <p style="margin-top:1rem;opacity:.8;font-size:.9rem">Once approved, you can login with your username and password.</p>
+            <p style="margin-top:1rem"><strong>Username: </strong><span id="confirmedUser" style="color:var(--gold)"></span></p>
+            <a href="student-login.html" class="btn-gold" style="display:inline-block;margin-top:1.5rem">Go to Login</a>
+        </div>
+    </div>
+</div>
+
+<script src="js/db.js"></script>
+<script>
+    let pendingData = {};
+
+    document.getElementById('regForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const msg = document.getElementById('regMsg');
+        const username = document.getElementById('regUser').value.trim().toLowerCase().replace(/\s+/g, '_');
+        const pass     = document.getElementById('regPass').value;
+
+        if (pass.length < 6) {
+            msg.textContent = 'Password must be at least 6 characters.';
+            msg.className = 'msg msg-err'; msg.classList.remove('hidden'); return;
+        }
+        const all = DB.getStudents();
+        const pend = DB.getPending();
+        if (all.some(s => s.id === username) || pend.some(p => p.username === username)) {
+            msg.textContent = 'Username already taken. Please choose another.';
+            msg.className = 'msg msg-err'; msg.classList.remove('hidden'); return;
+        }
+
+        pendingData = {
+            username,
+            name:     document.getElementById('regName').value.trim(),
+            password: pass,
+            email:    document.getElementById('regEmail').value.trim(),
+            contact:  document.getElementById('regPhone').value.trim(),
+            belt:     document.getElementById('regBelt').value,
+            batch:    document.getElementById('regBatch').value
+        };
+
+        const site = DB.getSite();
+        document.getElementById('upiDisplay').textContent = site.upiId || 'Ask Chairman for UPI';
+        document.getElementById('step1').classList.add('hidden');
+        document.getElementById('step2').classList.remove('hidden');
+    });
+
+    document.getElementById('backBtn').onclick = function() {
+        document.getElementById('step2').classList.add('hidden');
+        document.getElementById('step1').classList.remove('hidden');
+    };
+
+    document.getElementById('submitPay').onclick = function() {
+        const file = document.getElementById('payScreenshot').files[0];
+        const msg  = document.getElementById('payMsg');
+        if (!file) {
+            msg.textContent = 'Please upload payment screenshot.';
+            msg.className = 'msg msg-err'; msg.classList.remove('hidden'); return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            pendingData.payScreenshot = ev.target.result;
+            DB.addPending(pendingData);
+            document.getElementById('confirmedUser').textContent = pendingData.username;
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    };
+</script>
+</body>
+</html>

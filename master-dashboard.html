@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chairman Admin Dashboard — TSKA</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+<nav class="nav">
+    <a class="nav-logo" href="index.html">🥋 TSKA</a>
+    <ul class="nav-links" style="display:flex;gap:.75rem">
+        <li><span style="color:var(--gold)" id="adminName"></span></li>
+        <li><a href="index.html" target="_blank" class="nav-login">View Site</a></li>
+        <li><a href="index.html" id="logoutBtn" class="nav-admin">Logout</a></li>
+    </ul>
+</nav>
+
+<div class="dash-wrap">
+<div class="dash-inner">
+    <div class="dash-title">Chairman Admin Dashboard</div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="approvals">Approvals</button>
+        <button class="tab-btn" data-tab="students">Students</button>
+        <button class="tab-btn" data-tab="attendance">Attendance</button>
+        <button class="tab-btn" data-tab="fees">Fees</button>
+        <button class="tab-btn" data-tab="certificates">Certificates</button>
+        <button class="tab-btn" data-tab="website">Website</button>
+        <button class="tab-btn" data-tab="enquiries">Enquiries</button>
+    </div>
+
+    <!-- ── Approvals ── -->
+    <div class="tab-pane active" id="tab-approvals">
+        <div class="dash-card">
+            <h3>Pending Student Registrations</h3>
+            <div id="approvalList"></div>
+        </div>
+    </div>
+
+    <!-- ── Students ── -->
+    <div class="tab-pane" id="tab-students">
+        <div class="dash-card">
+            <h3>All Students</h3>
+            <button class="btn-gold" id="addStudentBtn" style="margin-bottom:1rem">+ Add Student Manually (Free)</button>
+            <div style="overflow-x:auto" id="studentTableWrap"></div>
+        </div>
+    </div>
+
+    <!-- ── Attendance ── -->
+    <div class="tab-pane" id="tab-attendance">
+        <div class="dash-card">
+            <h3>Mark Attendance</h3>
+            <div class="fg" style="max-width:200px">
+                <label>Date</label>
+                <input type="date" id="attDate">
+            </div>
+            <div id="attMarkList" style="overflow-x:auto"></div>
+            <button class="btn-gold" id="saveAttBtn" style="margin-top:1rem">Save Attendance</button>
+        </div>
+        <div class="dash-card">
+            <h3>Attendance Summary</h3>
+            <div id="attSummary" style="overflow-x:auto"></div>
+        </div>
+    </div>
+
+    <!-- ── Fees ── -->
+    <div class="tab-pane" id="tab-fees">
+        <div class="dash-card">
+            <h3>Fee Management</h3>
+            <div class="fg" style="max-width:200px">
+                <label>Monthly Fee (₹)</label>
+                <input type="number" id="feesInput" value="700">
+            </div>
+            <button class="btn-gold" id="saveFeesBtn">Save</button>
+        </div>
+        <div class="dash-card">
+            <h3>Student Fee Status</h3>
+            <div style="overflow-x:auto" id="feeTableWrap"></div>
+        </div>
+    </div>
+
+    <!-- ── Certificates ── -->
+    <div class="tab-pane" id="tab-certificates">
+        <div class="dash-card">
+            <h3>Generate Certificate</h3>
+            <div class="fg">
+                <label>Student</label>
+                <select id="certStudent"></select>
+            </div>
+            <div class="fg">
+                <label>Certificate Type</label>
+                <select id="certType">
+                    <option value="Achievement">Achievement Award</option>
+                    <option value="Belt Promotion">Belt Promotion</option>
+                    <option value="Tournament Participation">Tournament Participation</option>
+                    <option value="Special Recognition">Special Recognition</option>
+                </select>
+            </div>
+            <div class="fg"><label>Event / Award Name</label><input type="text" id="certEvent" placeholder="e.g. District Karate Championship 2025"></div>
+            <button class="btn-gold" id="genCertBtn">Generate Certificate</button>
+        </div>
+        <div class="dash-card" id="certPreviewWrap" style="display:none">
+            <h3>Certificate Preview</h3>
+            <div id="certPreview"></div>
+            <div style="text-align:center;margin-top:1rem">
+                <button class="btn-gold" id="downloadCertBtn">⬇ Download PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Website Management ── -->
+    <div class="tab-pane" id="tab-website">
+        <!-- Announcements -->
+        <div class="dash-card">
+            <h3>📢 Announcements</h3>
+            <button class="btn-red" id="addAnnBtn">+ Add Announcement</button>
+            <div id="annList" style="margin-top:1rem"></div>
+        </div>
+        <!-- Achievements -->
+        <div class="dash-card">
+            <h3>🏆 Achievements</h3>
+            <div style="display:flex;gap:.5rem;margin-bottom:1rem">
+                <input type="text" id="achInput" placeholder="Add achievement" style="flex:1;padding:.65rem 1rem;background:rgba(255,255,255,.05);border:1px solid rgba(212,175,55,.25);border-radius:8px;color:var(--white)">
+                <button class="btn-gold" id="addAchBtn">Add</button>
+            </div>
+            <div id="achList"></div>
+        </div>
+        <!-- Gallery -->
+        <div class="dash-card">
+            <h3>📸 Gallery</h3>
+            <div style="display:flex;gap:.5rem;margin-bottom:.5rem;flex-wrap:wrap">
+                <input type="url" id="galUrl" placeholder="Image URL" style="flex:1;min-width:180px;padding:.65rem 1rem;background:rgba(255,255,255,.05);border:1px solid rgba(212,175,55,.25);border-radius:8px;color:var(--white)">
+                <input type="text" id="galCaption" placeholder="Caption" style="flex:1;min-width:140px;padding:.65rem 1rem;background:rgba(255,255,255,.05);border:1px solid rgba(212,175,55,.25);border-radius:8px;color:var(--white)">
+                <button class="btn-gold" id="addGalBtn">Add</button>
+            </div>
+            <div id="galList"></div>
+        </div>
+        <!-- Tournaments -->
+        <div class="dash-card">
+            <h3>🥊 Tournaments</h3>
+            <button class="btn-red" id="addTournBtn">+ Add Tournament</button>
+            <div id="tournList" style="margin-top:1rem"></div>
+        </div>
+        <!-- Contact & UPI -->
+        <div class="dash-card">
+            <h3>⚙️ Site Settings</h3>
+            <div class="fg"><label>Contact Number</label><input type="text" id="contactInput"></div>
+            <div class="fg"><label>UPI ID (for ₹200 registration)</label><input type="text" id="upiInput"></div>
+            <button class="btn-gold" id="saveSiteBtn">Save Settings</button>
+        </div>
+    </div>
+
+    <!-- ── Enquiries ── -->
+    <div class="tab-pane" id="tab-enquiries">
+        <div class="dash-card">
+            <h3>📥 Enquiries</h3>
+            <div id="enqList"></div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Modals -->
+<div class="modal-overlay hidden" id="addStudentModal">
+    <div class="modal-box">
+        <h2>Add Student Manually</h2>
+        <div class="fg"><label>Username *</label><input type="text" id="mStuUser" required></div>
+        <div class="fg"><label>Full Name *</label><input type="text" id="mStuName" required></div>
+        <div class="fg"><label>Password *</label><input type="password" id="mStuPass" required></div>
+        <div class="fg"><label>Email</label><input type="email" id="mStuEmail"></div>
+        <div class="fg"><label>Phone</label><input type="tel" id="mStuPhone"></div>
+        <div class="fg"><label>Belt</label>
+            <select id="mStuBelt">
+                <option>White</option><option>Yellow</option><option>Orange</option>
+                <option>Green</option><option>Blue</option><option>Brown</option><option>Black</option>
+            </select>
+        </div>
+        <div class="fg"><label>Batch</label><input type="text" id="mStuBatch" placeholder="Morning / Evening"></div>
+        <div id="mStuMsg" class="msg hidden"></div>
+        <div class="modal-foot">
+            <button class="btn-gold" id="saveMStu">Save Student</button>
+            <button class="btn-outline" id="closeMStu">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay hidden" id="addAnnModal">
+    <div class="modal-box">
+        <h2>Add Announcement</h2>
+        <div class="fg"><label>Announcement Text *</label><textarea id="annTextInput" rows="3" required style="width:100%;padding:.75rem;background:rgba(255,255,255,.05);border:1px solid rgba(212,175,55,.25);border-radius:8px;color:var(--white)"></textarea></div>
+        <div class="fg"><label>Date</label><input type="date" id="annDateInput"></div>
+        <div class="modal-foot">
+            <button class="btn-gold" id="saveAnn">Save</button>
+            <button class="btn-outline" id="closeAnn">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay hidden" id="addTournModal">
+    <div class="modal-box">
+        <h2>Add Tournament</h2>
+        <div class="fg"><label>Tournament Name *</label><input type="text" id="tName" required></div>
+        <div class="fg"><label>Date *</label><input type="date" id="tDate" required></div>
+        <div class="fg"><label>Status</label>
+            <select id="tStatus"><option value="upcoming">Upcoming</option><option value="open">Open</option><option value="closed">Closed</option></select>
+        </div>
+        <div class="fg"><label>Description</label><textarea id="tDesc" rows="2" style="width:100%;padding:.75rem;background:rgba(255,255,255,.05);border:1px solid rgba(212,175,55,.25);border-radius:8px;color:var(--white)"></textarea></div>
+        <div class="modal-foot">
+            <button class="btn-gold" id="saveTourn">Save</button>
+            <button class="btn-outline" id="closeTourn">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/db.js"></script>
+<script>
+const master = JSON.parse(sessionStorage.getItem('tska_master'));
+if (!master) window.location.href = 'master-login.html';
+document.getElementById('adminName').textContent = master.name;
+document.getElementById('logoutBtn').addEventListener('click', () => {
+    sessionStorage.removeItem('tska_master');
+    window.location.href = 'index.html';
+});
+
+// Tabs
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+        if (this.dataset.tab === 'approvals')  renderApprovals();
+        if (this.dataset.tab === 'students')   renderStudents();
+        if (this.dataset.tab === 'attendance') renderAttendanceMark();
+        if (this.dataset.tab === 'fees')       renderFees();
+        if (this.dataset.tab === 'certificates') renderCertStudents();
+        if (this.dataset.tab === 'website')    renderWebsite();
+        if (this.dataset.tab === 'enquiries')  renderEnquiries();
+    });
+});
+
+// ── APPROVALS ──
+function renderApprovals() {
+    const pend = DB.getPending();
+    const el = document.getElementById('approvalList');
+    if (!pend.length) { el.innerHTML = '<p style="opacity:.6">No pending registrations.</p>'; return; }
+    el.innerHTML = pend.map((p, i) => `
+        <div style="background:rgba(0,0,0,.3);border-radius:12px;padding:1.25rem;margin-bottom:1rem;border:1px solid rgba(212,175,55,.2)">
+            <strong>${p.name}</strong> (@${p.username}) | ${p.belt} Belt | ${p.batch || '—'} Batch<br>
+            <small>Submitted: ${new Date(p.submittedAt).toLocaleString()}</small>
+            ${p.payScreenshot ? `<br><a href="${p.payScreenshot}" target="_blank" class="auth-link" style="display:inline;font-size:.85rem">View Payment Screenshot</a>` : ''}
+            <div style="margin-top:.75rem;display:flex;gap:.75rem;flex-wrap:wrap">
+                <button class="btn-gold" onclick="approveReg(${i})">✔ Approve</button>
+                <button class="btn-red"  onclick="rejectReg(${i})">✘ Reject</button>
+            </div>
+        </div>
+    `).join('');
+}
+function approveReg(i) {
+    if (!confirm('Approve this registration?')) return;
+    DB.approvePending(i);
+    renderApprovals();
+    alert('Student approved! They can now login.');
+}
+function rejectReg(i) {
+    if (!confirm('Reject this registration?')) return;
+    DB.rejectPending(i);
+    renderApprovals();
+}
+renderApprovals();
+
+// ── STUDENTS ──
+function renderStudents() {
+    const students = DB.getStudents();
+    const el = document.getElementById('studentTableWrap');
+    el.innerHTML = students.length ? `
+        <table class="tbl">
+            <thead><tr><th>Reg No</th><th>Name</th><th>Username</th><th>Belt</th><th>Batch</th><th>Join Date</th><th>Actions</th></tr></thead>
+            <tbody>${students.map(s => `
+                <tr>
+                    <td style="color:var(--gold);font-weight:700">${s.regNo}</td>
+                    <td>${s.name}</td><td>@${s.id}</td>
+                    <td>${s.belt || 'White'}</td><td>${s.batch || '—'}</td><td>${s.joinDate || '—'}</td>
+                    <td>
+                        <button class="btn-gold" onclick="editBelt('${s.id}')" style="padding:.35rem .8rem;font-size:.8rem">Edit Belt</button>
+                        <button class="btn-red"  onclick="delStudent('${s.id}')" style="padding:.35rem .8rem;font-size:.8rem;margin-left:.4rem">Delete</button>
+                    </td>
+                </tr>`).join('')}
+            </tbody>
+        </table>` : '<p style="opacity:.6">No approved students yet.</p>';
+}
+
+function editBelt(id) {
+    const belt = prompt('Enter new belt level:', DB.getStudent(id)?.belt || 'White');
+    if (belt) { DB.updateStudent(id, { belt }); renderStudents(); }
+}
+function delStudent(id) {
+    if (!confirm('Delete this student?')) return;
+    const s = DB.getStudents().filter(x => x.id !== id);
+    DB.saveStudents(s);
+    renderStudents();
+}
+
+document.getElementById('addStudentBtn').onclick = () => document.getElementById('addStudentModal').classList.remove('hidden');
+document.getElementById('closeMStu').onclick    = () => document.getElementById('addStudentModal').classList.add('hidden');
+document.getElementById('saveMStu').onclick     = function() {
+    const username = document.getElementById('mStuUser').value.trim().toLowerCase();
+    const name  = document.getElementById('mStuName').value.trim();
+    const pass  = document.getElementById('mStuPass').value;
+    const msg   = document.getElementById('mStuMsg');
+    if (!username || !name || !pass) { msg.textContent = 'Please fill required fields.'; msg.className = 'msg msg-err'; msg.classList.remove('hidden'); return; }
+    if (DB.getStudents().some(s => s.id === username)) { msg.textContent = 'Username exists.'; msg.className = 'msg msg-err'; msg.classList.remove('hidden'); return; }
+    DB.addStudent({ id: username, username, name, password: pass, email: document.getElementById('mStuEmail').value.trim(), contact: document.getElementById('mStuPhone').value.trim(), belt: document.getElementById('mStuBelt').value, batch: document.getElementById('mStuBatch').value.trim(), status: 'approved' });
+    document.getElementById('addStudentModal').classList.add('hidden');
+    renderStudents();
+};
+
+// ── ATTENDANCE ──
+const attDateInput = document.getElementById('attDate');
+attDateInput.value = new Date().toISOString().split('T')[0];
+attDateInput.addEventListener('change', renderAttendanceMark);
+let attState = {};
+
+function renderAttendanceMark() {
+    const date = attDateInput.value;
+    const students = DB.getStudents();
+    attState = {};
+    students.forEach(s => { attState[s.id] = (s.attendance?.[date] || 'A'); });
+
+    const el = document.getElementById('attMarkList');
+    el.innerHTML = students.length ? `
+        <table class="tbl">
+            <thead><tr><th>Reg No</th><th>Name</th><th>Status</th></tr></thead>
+            <tbody>${students.map(s => `
+                <tr>
+                    <td style="color:var(--gold)">${s.regNo}</td>
+                    <td>${s.name}</td>
+                    <td>
+                        <button class="att-toggle-btn ${attState[s.id]==='P'?'att-p':'att-a'}" data-sid="${s.id}">
+                            ${attState[s.id]==='P'?'✔ Present':'✘ Absent'}
+                        </button>
+                    </td>
+                </tr>`).join('')}
+            </tbody>
+        </table>` : '<p style="opacity:.6">No students to mark.</p>';
+
+    document.querySelectorAll('.att-toggle-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const sid = this.dataset.sid;
+            attState[sid] = attState[sid] === 'P' ? 'A' : 'P';
+            this.textContent = attState[sid] === 'P' ? '✔ Present' : '✘ Absent';
+            this.className = `att-toggle-btn ${attState[sid]==='P'?'att-p':'att-a'}`;
+        });
+    });
+
+    // Summary
+    const sum = document.getElementById('attSummary');
+    sum.innerHTML = students.length ? `
+        <table class="tbl">
+            <thead><tr><th>Reg No</th><th>Name</th><th>Total P</th><th>Total A</th><th>%</th></tr></thead>
+            <tbody>${students.map(s => {
+                const att = s.attendance || {};
+                const p = Object.values(att).filter(v=>v==='P').length;
+                const total = Object.values(att).length;
+                return `<tr><td style="color:var(--gold)">${s.regNo}</td><td>${s.name}</td><td style="color:#4ade80">${p}</td><td style="color:#f87171">${total-p}</td><td>${total?Math.round(p/total*100):0}%</td></tr>`;
+            }).join('')}
+            </tbody>
+        </table>` : '';
+}
+
+document.getElementById('saveAttBtn').onclick = function() {
+    const date = attDateInput.value;
+    Object.entries(attState).forEach(([sid, val]) => DB.markAttendance(sid, date, val==='P'));
+    alert('Attendance saved!');
+};
+
+// ── FEES ──
+function renderFees() {
+    const site = DB.getSite();
+    document.getElementById('feesInput').value = site.fees || 700;
+    const students = DB.getStudents();
+    document.getElementById('feeTableWrap').innerHTML = students.length ? `
+        <table class="tbl">
+            <thead><tr><th>Reg No</th><th>Name</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>${students.map(s => `
+                <tr>
+                    <td style="color:var(--gold)">${s.regNo}</td><td>${s.name}</td>
+                    <td><span class="pill ${s.feeStatus==='paid'?'pill-approved':'pill-pending'}">${s.feeStatus==='paid'?'Paid':'Pending'}</span></td>
+                    <td>
+                        <button class="btn-gold" onclick="markFeePaid('${s.id}')" style="padding:.35rem .8rem;font-size:.8rem">Mark Paid</button>
+                    </td>
+                </tr>`).join('')}
+            </tbody>
+        </table>` : '<p style="opacity:.6">No students.</p>';
+}
+
+document.getElementById('saveFeesBtn').onclick = function() {
+    const site = DB.getSite();
+    site.fees = parseInt(document.getElementById('feesInput').value) || 700;
+    DB.saveSite(site);
+    alert('Fee updated!');
+};
+
+function markFeePaid(id) {
+    const month = prompt('Enter month (e.g. June 2025):');
+    if (!month) return;
+    const s = DB.getStudent(id);
+    const fh = s.feeHistory || [];
+    const site = DB.getSite();
+    fh.push({ month, amount: site.fees || 700, note: 'Paid', date: new Date().toISOString() });
+    DB.updateStudent(id, { feeStatus: 'paid', feeHistory: fh });
+    renderFees();
+}
+
+// ── CERTIFICATES ──
+function renderCertStudents() {
+    const sel = document.getElementById('certStudent');
+    sel.innerHTML = DB.getStudents().map(s => `<option value="${s.id}">${s.name} (${s.regNo})</option>`).join('');
+}
+
+document.getElementById('genCertBtn').onclick = function() {
+    const sId    = document.getElementById('certStudent').value;
+    const type   = document.getElementById('certType').value;
+    const event  = document.getElementById('certEvent').value.trim();
+    if (!event) { alert('Enter event/award name.'); return; }
+    const s = DB.getStudent(sId);
+    const cert = DB.addCert({ studentId: sId, type, eventName: event });
+
+    document.getElementById('certPreviewWrap').style.display = 'block';
+    document.getElementById('certPreview').innerHTML = `
+        <div class="certificate" id="certDoc">
+            <div class="cert-header">Tamilan Sports Karate Academy</div>
+            <div class="cert-seal">🥋</div>
+            <div class="cert-title">CERTIFICATE OF ${type.toUpperCase()}</div>
+            <div class="cert-body">
+                This is to certify that<br>
+                <div class="cert-name">${s.name}</div>
+                <div style="font-size:.85rem;margin:.25rem 0">Register No: ${s.regNo}</div>
+                <br>has successfully participated in / achieved<br>
+                <div class="cert-event">${event}</div>
+            </div>
+            <div class="cert-sig">Date: ${cert.date}<br><br>___________________________<br>Renshi. Moosa AR<br><small>Chairman | Tamilan Sports Karate Academy</small></div>
+        </div>`;
+    document.getElementById('certPreviewWrap').scrollIntoView({ behavior:'smooth' });
+};
+
+document.getElementById('downloadCertBtn').onclick = function() {
+    const el = document.getElementById('certDoc');
+    if (!el) return;
+    html2canvas(el, { scale:3, backgroundColor:'#fffdf0' }).then(canvas => {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('l','mm','a4');
+        const pW=297,pH=210,ratio=Math.min(pW/canvas.width,pH/canvas.height);
+        const w=canvas.width*ratio,h=canvas.height*ratio;
+        pdf.addImage(canvas.toDataURL('image/png'),'PNG',(pW-w)/2,(pH-h)/2,w,h);
+        pdf.save('TSKA_Certificate.pdf');
+    });
+};
+
+// ── WEBSITE ──
+function renderWebsite() {
+    const site = DB.getSite();
+    // Announcements
+    const aEl = document.getElementById('annList');
+    aEl.innerHTML = (site.announcements||[]).map((a,i) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem;background:rgba(0,0,0,.3);border-radius:8px;margin-bottom:.4rem">
+            <span>${typeof a==='string'?a:a.text}</span>
+            <button class="btn-red" onclick="delAnn(${i})" style="padding:.3rem .7rem;font-size:.8rem">Del</button>
+        </div>`).join('') || '<p style="opacity:.6">No announcements.</p>';
+
+    // Achievements
+    const acEl = document.getElementById('achList');
+    acEl.innerHTML = (site.achievements||[]).map((a,i) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem;background:rgba(0,0,0,.3);border-radius:8px;margin-bottom:.4rem">
+            <span>${typeof a==='string'?a:a.text}</span>
+            <button class="btn-red" onclick="delAch(${i})" style="padding:.3rem .7rem;font-size:.8rem">Del</button>
+        </div>`).join('') || '<p style="opacity:.6">No achievements.</p>';
+
+    // Gallery
+    const gEl = document.getElementById('galList');
+    gEl.innerHTML = (site.gallery||[]).map((g,i) => {
+        const url = typeof g==='string'?g:g.url, alt = typeof g==='string'?'Image':g.alt;
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem;background:rgba(0,0,0,.3);border-radius:8px;margin-bottom:.4rem">
+            <span>${alt} ${url?'('+url.slice(0,30)+'...)':''}</span>
+            <button class="btn-red" onclick="delGal(${i})" style="padding:.3rem .7rem;font-size:.8rem">Del</button>
+        </div>`;
+    }).join('') || '<p style="opacity:.6">No gallery images.</p>';
+
+    // Tournaments
+    const tEl = document.getElementById('tournList');
+    tEl.innerHTML = (site.tournaments||[]).map((t,i) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem;background:rgba(0,0,0,.3);border-radius:8px;margin-bottom:.4rem">
+            <span>${t.name} — ${t.date} <span class="tc-status ${t.status}" style="margin-left:.5rem">${t.status}</span></span>
+            <button class="btn-red" onclick="delTourn(${i})" style="padding:.3rem .7rem;font-size:.8rem">Del</button>
+        </div>`).join('') || '<p style="opacity:.6">No tournaments.</p>';
+
+    document.getElementById('contactInput').value = site.contactNumber || '';
+    document.getElementById('upiInput').value = site.upiId || '';
+}
+
+function delAnn(i)   { const s=DB.getSite(); s.announcements.splice(i,1); DB.saveSite(s); renderWebsite(); }
+function delAch(i)   { const s=DB.getSite(); s.achievements.splice(i,1);  DB.saveSite(s); renderWebsite(); }
+function delGal(i)   { const s=DB.getSite(); s.gallery.splice(i,1);       DB.saveSite(s); renderWebsite(); }
+function delTourn(i) { const s=DB.getSite(); s.tournaments.splice(i,1);   DB.saveSite(s); renderWebsite(); }
+
+document.getElementById('addAnnBtn').onclick    = () => { document.getElementById('annDateInput').value=new Date().toISOString().split('T')[0]; document.getElementById('addAnnModal').classList.remove('hidden'); };
+document.getElementById('closeAnn').onclick     = () => document.getElementById('addAnnModal').classList.add('hidden');
+document.getElementById('saveAnn').onclick      = function() {
+    const text = document.getElementById('annTextInput').value.trim();
+    if (!text) return;
+    const s = DB.getSite();
+    s.announcements.push({ id:Date.now(), text, date:document.getElementById('annDateInput').value });
+    DB.saveSite(s);
+    document.getElementById('addAnnModal').classList.add('hidden');
+    renderWebsite();
+};
+document.getElementById('addAchBtn').onclick    = function() {
+    const v = document.getElementById('achInput').value.trim();
+    if (!v) return;
+    const s = DB.getSite(); s.achievements.push(v); DB.saveSite(s);
+    document.getElementById('achInput').value = '';
+    renderWebsite();
+};
+document.getElementById('addGalBtn').onclick    = function() {
+    const url = document.getElementById('galUrl').value.trim();
+    if (!url) return;
+    const s = DB.getSite();
+    s.gallery.push({ url, alt:document.getElementById('galCaption').value.trim()||'Gallery Image' });
+    DB.saveSite(s);
+    document.getElementById('galUrl').value=''; document.getElementById('galCaption').value='';
+    renderWebsite();
+};
+document.getElementById('addTournBtn').onclick  = () => { document.getElementById('tDate').value=''; document.getElementById('addTournModal').classList.remove('hidden'); };
+document.getElementById('closeTourn').onclick   = () => document.getElementById('addTournModal').classList.add('hidden');
+document.getElementById('saveTourn').onclick    = function() {
+    const name=document.getElementById('tName').value.trim(), date=document.getElementById('tDate').value;
+    if (!name||!date) return;
+    const s=DB.getSite();
+    s.tournaments.push({ id:Date.now(), name, date, status:document.getElementById('tStatus').value, desc:document.getElementById('tDesc').value.trim() });
+    DB.saveSite(s);
+    document.getElementById('addTournModal').classList.add('hidden');
+    renderWebsite();
+};
+document.getElementById('saveSiteBtn').onclick = function() {
+    const s=DB.getSite();
+    s.contactNumber=document.getElementById('contactInput').value.trim();
+    s.upiId=document.getElementById('upiInput').value.trim();
+    DB.saveSite(s);
+    alert('Settings saved!');
+};
+
+// ── ENQUIRIES ──
+function renderEnquiries() {
+    const list = DB.getEnquiries();
+    const el = document.getElementById('enqList');
+    el.innerHTML = list.length ? list.map(e => `
+        <div style="padding:.85rem;border-bottom:1px solid rgba(255,255,255,.08)">
+            <strong>${e.name}</strong> — ${e.phone} ${e.email?'| '+e.email:''}
+            <br><small style="opacity:.7">${new Date(e.date).toLocaleString()}</small>
+            ${e.message?`<br><em>${e.message}</em>`:''}
+        </div>`).join('') : '<p style="opacity:.6">No enquiries yet.</p>';
+}
+
+// Initial render
+renderWebsite();
+
+// Expose globals
+window.approveReg=approveReg; window.rejectReg=rejectReg;
+window.editBelt=editBelt; window.delStudent=delStudent;
+window.markFeePaid=markFeePaid;
+window.delAnn=delAnn; window.delAch=delAch; window.delGal=delGal; window.delTourn=delTourn;
+
+// Attendance toggle styles inline
+const style = document.createElement('style');
+style.textContent = `.att-toggle-btn{padding:.4rem .9rem;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-family:'Outfit',sans-serif;transition:all .2s}.att-p{background:rgba(34,197,94,.3);color:#4ade80;border:1px solid #22c55e}.att-a{background:rgba(239,68,68,.3);color:#f87171;border:1px solid #ef4444}`;
+document.head.appendChild(style);
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Login — TSKA</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="nav">
+    <a class="nav-logo" href="index.html">🥋 TSKA</a>
+    <ul class="nav-links" style="display:flex">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="student-register.html" class="nav-cta">Register</a></li>
+    </ul>
+</nav>
+
+<div class="auth-page">
+    <!-- Login -->
+    <div class="auth-box" id="loginBox">
+        <h1>Student Login</h1>
+        <div id="loginMsg" class="msg hidden"></div>
+        <form id="loginForm">
+            <div class="fg"><label>Username</label><input type="text" id="loginUser" required placeholder="Your username"></div>
+            <div class="fg"><label>Password</label><input type="password" id="loginPass" required></div>
+            <button type="submit" class="btn-gold w100">Login</button>
+        </form>
+        <a class="auth-link" id="showReg">New here? Register (₹200 fee)</a>
+        <a href="index.html" class="back-home">← Back to Home</a>
+    </div>
+</div>
+
+<script src="js/db.js"></script>
+<script>
+    document.getElementById('showReg').onclick = () => window.location.href = 'student-register.html';
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const user = document.getElementById('loginUser').value.trim().toLowerCase();
+        const pass = document.getElementById('loginPass').value;
+        const msg  = document.getElementById('loginMsg');
+        const students = DB.getStudents();
+        const found = students.find(s => s.id === user && s.password === pass);
+        if (found) {
+            if (found.status !== 'approved') {
+                msg.textContent = 'Your registration is pending Chairman approval.';
+                msg.className = 'msg msg-err'; msg.classList.remove('hidden'); return;
+            }
+            sessionStorage.setItem('tska_student', JSON.stringify(found));
+            window.location.href = 'student-dashboard.html';
+        } else {
+            msg.textContent = 'Invalid username or password.';
+            msg.className = 'msg msg-err'; msg.classList.remove('hidden');
+        }
+    });
+</script>
+</body>
+</html>
